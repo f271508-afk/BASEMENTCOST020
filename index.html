@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>地下室工程造價概算系統 v57.6.2</title>
+    <title>地下室工程造價概算系統 v58.4.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -25,7 +25,7 @@
         <header class="flex flex-col md:flex-row md:items-start justify-between mb-8 gap-6 border-b pb-8 border-slate-200">
             <div class="space-y-3">
                 <div class="flex items-center gap-2 text-indigo-600 font-black text-xs tracking-widest uppercase">
-                    <span class="bg-indigo-600 text-white px-2 py-0.5 rounded">PRO</span> Version 57.6.2
+                    <span class="bg-indigo-600 text-white px-2 py-0.5 rounded">PRO</span> Version 58.4.0
                 </div>
                 <h1 class="text-3xl font-black text-slate-800 flex items-center gap-3">
                     <i data-lucide="building-2" class="text-indigo-700 w-8 h-8"></i>
@@ -111,14 +111,14 @@
             <section class="lg:col-span-7 space-y-6">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="physics-cards"></div>
 
-                <!-- 預預算表 -->
+                <!-- 預算表 -->
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left min-w-[600px]">
                             <thead class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase border-b">
                                 <tr>
                                     <th class="px-8 py-4">預算大項 / 細項</th>
-                                    <th class="px-8 py-4">數量 / 單位</th>
+                                    <th class="px-8 py-4">數量 / 單位 / 計算規則</th>
                                     <th class="px-8 py-4 text-right">單價</th>
                                     <th class="px-8 py-4 text-right">概算金額</th>
                                 </tr>
@@ -149,7 +149,7 @@
                             <div id="retaining-rates-list" class="space-y-3"></div>
                         </div>
                         <div class="space-y-4">
-                            <h5 class="text-[11px] font-black text-rose-400 flex items-center gap-2 mb-4"><i data-lucide="anchor" class="w-4 h-4"></i> 支撐與構台</h5>
+                            <h5 class="text-[11px] font-black text-rose-400 flex items-center gap-2 mb-4"><i data-lucide="anchor" class="w-4 h-4"></i> 支撐、中間樁與構台</h5>
                             <div id="support-params-list" class="space-y-3"></div>
                         </div>
                     </div>
@@ -188,7 +188,9 @@
             rateGuideWall: 4500, rateWallChip: 1200, rateWallRebarBend: 1200,
             depthRatio: 2.0, thicknessRatio: 20, ratePavement: 1200, rateSettlingTank: 150000,
             supportHorizontalSpacing: 5, supportVerticalSpan: 3.5, platformRatio: 0.4,
-            rateSupportM2: 850, rateSupportPostRent: 35000, rateSupportPostBuy: 55000,
+            rateSupportM2: 850, 
+            rateSupportPostBuy: 55000,
+            rateSupportPostInstall: 8500,
             ratePlatformM2: 12000, rateMonitoring: 500,
             rateEarthworkM3: 650, rateRC_M3: 3100, ratePC_M3: 2500,
             rateForm_M2: 950, rateRebar_T: 32500, rateBasementMEP: 14000,
@@ -206,9 +208,10 @@
             rateWallChip: '劣質打除 (元/m)', rateWallRebarBend: '預留筋彎出及撥筋 (元/m)',
             depthRatio: '連壁深度比 (倍)', thicknessRatio: '連壁厚度比 (1/N)',
             ratePavement: '舖面工程 (元/m²)', rateSettlingTank: '棄土沈澱池 (元/式)',
-            supportHorizontalSpacing: '支撐水平間距 (m)', supportVerticalSpan: '支撐垂直跨距 (m)',
+            supportHorizontalSpacing: '中間樁水平距 (m)', supportVerticalSpan: '支撐垂直跨距 (m)',
             platformRatio: '施工構台比例 (0~1)', rateSupportM2: '支撐費 (元/m²)',
-            rateSupportPostRent: '中間樁租金 (元/支)', rateSupportPostBuy: '中間樁買斷 (元/支)',
+            rateSupportPostBuy: '中間樁買斷 (元/支)',
+            rateSupportPostInstall: '中間樁施作 (元/支)',
             ratePlatformM2: '施工構台 (元/m²)', rateMonitoring: '安全觀測 (元/坪)',
             rateEarthworkM3: '土方清運 (元/m³)', rateRC_M3: '混凝土 (元/m³)',
             ratePC_M3: 'PC 混凝土 (元/m³)', rateForm_M2: '模板 (元/m²)',
@@ -223,7 +226,7 @@
 
         const GROUPS = {
             retaining: ['rateWall60', 'rateWall70', 'rateWall80', 'rateWall90', 'rateWall100', 'rateGuideWall', 'rateWallChip', 'rateWallRebarBend', 'depthRatio', 'thicknessRatio', 'ratePavement', 'rateSettlingTank', 'pileSpacing', 'rateCappingBeam', 'ratePileUnit'],
-            support: ['supportHorizontalSpacing', 'supportVerticalSpan', 'platformRatio', 'rateSupportM2', 'rateSupportPostRent', 'rateSupportPostBuy', 'ratePlatformM2', 'rateMonitoring'],
+            support: ['supportHorizontalSpacing', 'supportVerticalSpan', 'platformRatio', 'rateSupportM2', 'rateSupportPostInstall', 'rateSupportPostBuy', 'ratePlatformM2', 'rateMonitoring'],
             structural: ['rateEarthworkM3', 'rateRC_M3', 'ratePC_M3', 'rateForm_M2', 'rateRebar_T', 'rateBasementMEP', 'rateBasementFinish'],
             usage: ['unitRC_Raft', 'unitForm_Raft', 'unitRebar_Raft', 'unitRC_B1', 'unitForm_B1', 'unitRebar_B1', 'unitRC_Typ', 'unitForm_Typ', 'unitRebar_Typ', 'height_B1', 'height_Typ', 'height_Raft']
         };
@@ -238,7 +241,7 @@
                 if (!configStr) { render(); return; }
                 firebase.initializeApp(JSON.parse(configStr));
                 auth = firebase.auth(); db = firebase.firestore();
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'basement-v57-stable';
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'basement-v58-post';
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await auth.signInWithCustomToken(__initial_auth_token);
                 else await auth.signInAnonymously();
                 auth.onAuthStateChanged(user => {
@@ -312,13 +315,12 @@
 
             const isWall = state.retainingMethod === 'wall';
             
-            // 擋土細項計算
+            // 擋土細項
             let retainingSubItems = [];
             if (isWall) {
                 const wallThickness = Math.max(0.6, Math.round((excavationDepth / (reg.thicknessRatio || 20)) * 10) / 10);
                 const wallDepth = excavationDepth * (reg.depthRatio || 2);
                 const wallArea = finalPerimeter * wallDepth;
-                
                 let wallRate = reg.rateWall80;
                 let wallLabel = "連續壁體 (80cm)";
                 if (wallThickness >= 1.0) { wallRate = reg.rateWall100; wallLabel = "連續壁體 (100cm)"; }
@@ -326,66 +328,61 @@
                 else if (wallThickness <= 0.6) { wallRate = reg.rateWall60; wallLabel = "連續壁體 (60cm)"; }
                 else if (wallThickness <= 0.7) { wallRate = reg.rateWall70; wallLabel = "連續壁體 (70cm)"; }
 
-                const rebarBendM = finalPerimeter * floors;
-                
                 retainingSubItems = [
-                    { n: wallLabel, q: wallArea, u: "m²", r: wallRate, t: wallArea * wallRate },
-                    { n: "導溝工程", q: finalPerimeter, u: "m", r: reg.rateGuideWall, t: finalPerimeter * reg.rateGuideWall },
-                    { n: "劣質混凝土打除", q: finalPerimeter, u: "m", r: reg.rateWallChip, t: finalPerimeter * reg.rateWallChip },
-                    { n: "預留筋彎出及撥筋", q: rebarBendM, u: "m", r: reg.rateWallRebarBend, t: rebarBendM * reg.rateWallRebarBend },
-                    { n: "棄土沈澱池/泥漿處理", q: 1, u: "式", r: reg.rateSettlingTank, t: reg.rateSettlingTank }
+                    { n: wallLabel, q: wallArea, u: "m²", r: wallRate, t: wallArea * wallRate, rule: `週長(${finalPerimeter}) × 壁深(${wallDepth.toFixed(1)})` },
+                    { n: "導溝工程", q: finalPerimeter, u: "m", r: reg.rateGuideWall, t: finalPerimeter * reg.rateGuideWall, rule: `建築週長` },
+                    { n: "棄土沈澱池/泥漿處理", q: 1, u: "式", r: reg.rateSettlingTank, t: reg.rateSettlingTank, rule: `固定費` }
                 ];
             } else {
                 const pileSpacing = reg.pileSpacing || 1.2;
                 const pileCount = Math.ceil(finalPerimeter / pileSpacing);
                 retainingSubItems = [
-                    { n: "排樁鑽孔灌漿工程", q: pileCount, u: "支", r: reg.ratePileUnit, t: pileCount * reg.ratePileUnit },
-                    { n: "冠樑工程 (RC)", q: finalPerimeter, u: "m", r: reg.rateCappingBeam, t: finalPerimeter * reg.rateCappingBeam }
+                    { n: "排樁鑽孔灌漿工程", q: pileCount, u: "支", r: reg.ratePileUnit, t: pileCount * reg.ratePileUnit, rule: `週長 / 間距(${pileSpacing})` },
+                    { n: "冠樑工程 (RC)", q: finalPerimeter, u: "m", r: reg.rateCappingBeam, t: finalPerimeter * reg.rateCappingBeam, rule: `建築週長` }
                 ];
             }
             const retainingTotal = retainingSubItems.reduce((acc, cur) => acc + cur.t, 0);
 
-            // 結構細項計算 (鋼筋改為 T)
-            const structureSubItems = [
-                { n: "混凝土工程 (RC)", q: totalRC, u: "m³", r: reg.rateRC_M3, t: totalRC * reg.rateRC_M3 },
-                { n: "模板工程", q: totalForm, u: "m²", r: reg.rateForm_M2, t: totalForm * reg.rateForm_M2 },
-                { n: "鋼筋工程", q: totalRebarT, u: "T", r: reg.rateRebar_T, t: totalRebarT * reg.rateRebar_T },
-                { n: "打底 PC 工程", q: areaM2 * 0.1, u: "m³", r: reg.ratePC_M3, t: areaM2 * 0.1 * reg.ratePC_M3 }
-            ];
-            const structureTotal = structureSubItems.reduce((acc, cur) => acc + cur.t, 0);
-
-            // 支撐細項計算
+            // 支撐細項
             const supportLayers = Math.ceil(excavationDepth / (reg.supportVerticalSpan || 3.5));
             const platformArea = areaM2 * (reg.platformRatio || 0.4);
+            const postSpacing = reg.supportHorizontalSpacing || 5;
+            const postsPerSide = Math.max(1, Math.ceil(Math.sqrt(areaM2) / postSpacing));
+            const totalPosts = postsPerSide * postsPerSide; 
+
             const supportSubItems = [
-                { n: "水平安全支撐 (含拆改)", q: areaM2 * supportLayers, u: "m²", r: reg.rateSupportM2, t: areaM2 * supportLayers * reg.rateSupportM2 },
-                { n: "施工構台 (H型鋼)", q: platformArea, u: "m²", r: reg.ratePlatformM2, t: platformArea * reg.ratePlatformM2 },
-                { n: "安全監測工程", q: state.belowUnitArea * floors, u: "坪", r: reg.rateMonitoring, t: (state.belowUnitArea * floors) * reg.rateMonitoring }
+                { n: "水平安全支撐 (含拆改)", q: areaM2 * supportLayers, u: "m²", r: reg.rateSupportM2, t: areaM2 * supportLayers * reg.rateSupportM2, rule: `單層面積 × 支撐層數(${supportLayers})` },
+                { n: "中間樁 - 施作工程", q: totalPosts, u: "支", r: reg.rateSupportPostInstall, t: totalPosts * reg.rateSupportPostInstall, rule: `推估數量: ${totalPosts} 支` },
+                { n: "中間樁 - 買斷材料", q: totalPosts, u: "支", r: reg.rateSupportPostBuy, t: totalPosts * reg.rateSupportPostBuy, rule: `(預算含此項) 中間樁 ${totalPosts} 支` },
+                { n: "施工構台 (H型鋼)", q: platformArea, u: "m²", r: reg.ratePlatformM2, t: platformArea * reg.ratePlatformM2, rule: `面積 × 配置比例(${(reg.platformRatio * 100).toFixed(0)}%)` }
             ];
             const supportTotal = supportSubItems.reduce((acc, cur) => acc + cur.t, 0);
 
-            // 土方與雜項計算
-            const earthworkVolume = areaM2 * excavationDepth;
+            // 結構與雜項
+            const structureTotal = (totalRC * reg.rateRC_M3) + (totalForm * reg.rateForm_M2) + (totalRebarT * reg.rateRebar_T);
             const totalBuildPing = state.belowUnitArea * floors;
-            const miscSubItems = [
-                { n: "土方開挖清運", q: earthworkVolume, u: "m³", r: reg.rateEarthworkM3, t: earthworkVolume * reg.rateEarthworkM3 },
-                { n: "地下室機電設備工程", q: totalBuildPing, u: "坪", r: reg.rateBasementMEP, t: totalBuildPing * reg.rateBasementMEP },
-                { n: "地下室簡易裝修/地坪", q: totalBuildPing, u: "坪", r: reg.rateBasementFinish, t: totalBuildPing * reg.rateBasementFinish }
-            ];
-            const miscTotal = miscSubItems.reduce((acc, cur) => acc + cur.t, 0);
+            const earthworkVolume = areaM2 * excavationDepth;
+            const miscTotal = (earthworkVolume * reg.rateEarthworkM3) + (totalBuildPing * (reg.rateBasementMEP + reg.rateBasementFinish));
 
             const total = retainingTotal + structureTotal + supportTotal + miscTotal;
             
             return { 
-                physics: { excavationDepth, totalBelowBuildArea: totalBuildPing, sysPerimeter, totalRC, totalRebarT }, 
+                physics: { excavationDepth, totalBelowBuildArea: totalBuildPing, sysPerimeter, totalRC, totalRebarT, earthworkVolume }, 
                 total, 
                 avg: totalBuildPing > 0 ? total / totalBuildPing : 0, 
                 reg, 
                 results: [
                     { l: "擋土工程預算", v: retainingTotal, sub: retainingSubItems, color: 'bg-indigo-500' },
-                    { l: "結構主體工程", v: structureTotal, sub: structureSubItems, color: 'bg-emerald-500' },
+                    { l: "結構主體工程", v: structureTotal, sub: [
+                        { n: "混凝土與 PC", q: totalRC, u: "m³", r: reg.rateRC_M3, t: totalRC * reg.rateRC_M3, rule: `總混凝土量` },
+                        { n: "模板工程", q: totalForm, u: "m²", r: reg.rateForm_M2, t: totalForm * reg.rateForm_M2, rule: `總模板面積` },
+                        { n: "鋼筋工程", q: totalRebarT, u: "T", r: reg.rateRebar_T, t: totalRebarT * reg.rateRebar_T, rule: `鋼筋噸數` }
+                    ], color: 'bg-emerald-500' },
                     { l: "安全支撐工程", v: supportTotal, sub: supportSubItems, color: 'bg-rose-500' },
-                    { l: "土方及機電雜項", v: miscTotal, sub: miscSubItems, color: 'bg-amber-500' }
+                    { l: "土方及機電雜項", v: miscTotal, sub: [
+                        { n: "土方開挖清運", q: earthworkVolume, u: "m³", r: reg.rateEarthworkM3, t: earthworkVolume * reg.rateEarthworkM3, rule: `開挖體積` },
+                        { n: "機電與裝修", q: totalBuildPing, u: "坪", r: reg.rateBasementMEP + reg.rateBasementFinish, t: totalBuildPing * (reg.rateBasementMEP + reg.rateBasementFinish), rule: `總建築面積坪數` }
+                    ], color: 'bg-amber-500' }
                 ]
             };
         }
@@ -401,14 +398,8 @@
         function exportToExcel() {
             const reg = regions.find(r => r.id === state.activeRegionId) || regions[0];
             const data = [["參數類別", "參數代碼", "顯示名稱", "數值", "單位/說明"]];
-            data.push(["基本資訊", "region_name", "區域名稱", reg.name, "-"]);
             const processGroup = (groupName, keys) => {
-                keys.forEach(k => {
-                    let category = groupName;
-                    if (k.startsWith('height_')) category = "層高設定";
-                    else if (k.startsWith('unit')) category = "用量設定";
-                    data.push([category, k, KEY_LABELS[k] || k, reg[k] !== undefined ? reg[k] : 0, "-"]);
-                });
+                keys.forEach(k => data.push([groupName, k, KEY_LABELS[k] || k, reg[k] !== undefined ? reg[k] : 0, "-"]));
             };
             processGroup("擋土工程", GROUPS.retaining);
             processGroup("安全支撐", GROUPS.support);
@@ -437,8 +428,7 @@
                     rows.slice(1).forEach(row => {
                         const [category, key, label, value] = row;
                         if (!key) return;
-                        if (key === 'region_name') { regions[regIdx].name = value; updates.name = value; }
-                        else if (DEFAULT_PARAMS.hasOwnProperty(key)) {
+                        if (DEFAULT_PARAMS.hasOwnProperty(key)) {
                             const numVal = parseFloat(value);
                             if (!isNaN(numVal)) { regions[regIdx][key] = numVal; updates[key] = numVal; }
                         }
@@ -487,9 +477,8 @@
                     <div class="flex justify-between items-center">
                         <span class="text-[10px] font-black text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${l.id} 參數設定</span>
                         <div class="flex items-center gap-2">
-                             <span class="text-[9px] font-bold text-slate-400 uppercase">層高:</span>
-                             <input type="number" step="0.1" value="${l.h}" onchange="updateRegionParam('height_${l.p}', this.value)" class="w-12 text-center text-xs font-black border-b border-indigo-200 outline-none focus:border-indigo-600">
-                             <span class="text-[9px] font-bold text-slate-400">m</span>
+                             <span class="text-[9px] font-bold text-slate-400">層高:</span>
+                             <input type="number" step="0.1" value="${l.h}" onchange="updateRegionParam('height_${l.p}', this.value)" class="w-12 text-center text-xs font-black border-b border-indigo-200 outline-none">
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-3">
@@ -512,7 +501,7 @@
             let budgetHtml = '';
             results.forEach(res => {
                 budgetHtml += `
-                    <tr class="bg-slate-50/50">
+                    <tr class="bg-slate-100/80">
                         <td class="px-8 py-5">
                             <div class="flex items-center gap-3">
                                 <div class="w-3 h-3 rounded-full ${res.color}"></div>
@@ -527,19 +516,22 @@
                     </tr>
                 `;
                 res.sub.forEach(sub => {
-                    const qDisplay = sub.u === 'T' ? decimalFmt.format(sub.q) : numFmt.format(sub.q);
+                    const qDisplay = (sub.u === 'T' || sub.u === '支/月') ? decimalFmt.format(sub.q) : numFmt.format(sub.q);
                     budgetHtml += `
                         <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="pl-14 pr-8 py-3 text-xs font-bold text-slate-500">
+                            <td class="pl-14 pr-8 py-4 text-xs font-bold text-slate-600">
                                 ${sub.n}
                             </td>
-                            <td class="px-8 py-3 text-xs text-slate-400 font-medium italic">
-                                ${qDisplay} ${sub.u}
+                            <td class="px-8 py-4">
+                                <div class="flex flex-col">
+                                    <span class="text-xs text-slate-700 font-black">${qDisplay} ${sub.u}</span>
+                                    <span class="text-[9px] text-indigo-500/70 font-bold mt-1">Rule: ${sub.rule}</span>
+                                </div>
                             </td>
-                            <td class="px-8 py-3 text-right text-xs text-slate-400 font-medium">
+                            <td class="px-8 py-4 text-right text-xs text-slate-400 font-medium">
                                 @ ${numFmt.format(sub.r)}
                             </td>
-                            <td class="px-8 py-3 text-right text-xs font-bold text-slate-600">
+                            <td class="px-8 py-4 text-right text-xs font-black text-slate-700">
                                 ${numFmt.format(sub.t)}元
                             </td>
                         </tr>
@@ -552,7 +544,7 @@
                 { l: "預估開挖深度", v: (physics.excavationDepth || 0).toFixed(1) + " m", i: "layers" },
                 { l: "總樓地板面積", v: Math.round(physics.totalBelowBuildArea || 0) + " 坪", i: "maximize" },
                 { l: "建築計算週長", v: (state.belowPerimeter || physics.sysPerimeter || 0) + " m", i: "ruler" },
-                { l: "鋼筋預估總量", v: decimalFmt.format(physics.totalRebarT || 0) + " T", i: "anchor" }
+                { l: "土方清運預估", v: numFmt.format(physics.earthworkVolume || 0) + " m³", i: "truck" }
             ].map(c => `<div class="bg-white p-4 rounded-2xl border shadow-sm"><div class="flex items-center gap-2 mb-2"><i data-lucide="${c.i}" class="w-3 h-3 text-slate-400"></i><span class="text-[9px] font-black text-slate-400 uppercase">${c.l}</span></div><div class="text-lg font-black text-slate-800">${c.v}</div></div>`).join('');
 
             lucide.createIcons();
